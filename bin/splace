@@ -1,6 +1,6 @@
 #!/bin/bash
 ##
-## Copyright 2019 Luis_Pulido_Diaz
+## Copyright 2019-2024 Luis_Pulido_Diaz
 ##
 ## Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),      ##
 ## to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,      ##
@@ -68,7 +68,8 @@ encrypt(){
 	echo "$@" >> "$tmpfile"
 	tmpfilee="$PLACED/$(date +%s)$(( RANDOM%9999 )).dat"
 	key="$(<$PLACED/$KEYF)"
-	openssl rsautl -encrypt -inkey "$PLACED/$PKEYF" -pubin -in "$tmpfile" -out "$tmpfilee"
+	# Updated to use pkeyutl
+	openssl pkeyutl -encrypt -inkey "$PLACED/$PKEYF" -pubin -in "$tmpfile" -out "$tmpfilee"
 	base64 -w 0 "$tmpfilee"
 	rm "$tmpfile" "$tmpfilee"
 }
@@ -76,7 +77,8 @@ decrypt(){
 	tmpfile="$PLACED/$(date +%s)$(( RANDOM%9999 )).dat"
 	tmpfilee="$PLACED/$(date +%s)$(( RANDOM%9999 )).txt"
 	echo "$@" | base64 -d >> "$tmpfile"
-	openssl rsautl -decrypt -inkey "$PLACED/$KEYF" -in "$tmpfile" -out "$tmpfilee"
+	# Updated to use pkeyutl
+	openssl pkeyutl -decrypt -inkey "$PLACED/$KEYF" -in "$tmpfile" -out "$tmpfilee"
 	echo "$(<$tmpfilee)"
 	rm "$tmpfile" "$tmpfilee"
 }
@@ -118,7 +120,7 @@ run(){
 		;;
 		--all)
 			check_empty
-			for i in $(seq 1 $(( $(cat $PLACEF | wc -l)-1 ))) ; do
+			for i in $(seq 1 $(( $(cat $PLACEF | wc -l) )) ) ; do
 				decrypt $(cat $PLACEF | tail -n $i | head -n 1)
 			done
 		;;
@@ -138,7 +140,7 @@ run(){
 			decrypt "$lastb"
 		;;
 		n)
-			maxn="$(($(cat $PLACEF | wc -l)-1))"
+			maxn="$(($(cat $PLACEF | wc -l)))"
 			test "$2" -gt "$maxn" && echo "E: Max is $maxn" >&2 && exit
 			test "$2" -lt 1 && echo "E: Only accepts from 1 to $maxn" >&2 && exit
 			decrypt "$(tail -n $2 $PLACEF | head -n 1)"
