@@ -1,0 +1,90 @@
+name: Build splace
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [linux, windows, darwin]
+        arch: [amd64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Build binary
+        run: |
+          mkdir -p artifacts
+          ext=""
+          if [ "${{ matrix.os }}" = "windows" ]; then ext=".exe"; fi
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} \
+            go build -buildvcs=false -ldflags="-s -w" -o artifacts/splace-${{ matrix.os }}${ext}
+
+      - name: Archive artifact
+        run: |
+          cd artifacts
+          zip splace-${{ matrix.os }}.zip splace-${{ matrix.os }}* 
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: splace-${{ matrix.os }}
+          path: artifacts/splace-${{ matrix.os }}.zip
+      - name: Generate installer script
+        run: |
+          cat > artifacts/install-${{ matrix.os }}.sh << 'EOF'
+          #!/usr/bin/env bash
+          set -e
+
+          # Installer for splace on ${{ matrix.os }}
+          BIN="splace-${{ matrix.os }}$( [ "${{ matrix.os }}" = "windows" ] && echo .exe )"
+          if [ ! -f "$BIN" ]; then
+            echo "Binary $BIN not found"
+            exit 1
+          fi
+
+          # Parse install mode
+          GLOBAL=false
+          if [ "$1" = "--global" ] || [ "$1" = "-g" ]; then
+            GLOBAL=true
+          fi
+
+          if [ "$GLOBAL" = true ]; then
+            # System-wide install
+            if ! command -v sudo >/dev/null 2>&1; then
+              echo "sudo is required for global installation"
+              exit 1
+            fi
+            echo "Installing splace globally (requires sudo)..."
+            sudo install -m 0755 "$BIN" /usr/local/bin/splace
+            echo "splace installed to /usr/local/bin/splace"
+          else
+            # Per-user install
+            echo "Installing splace for current user..."
+            mkdir -p "$HOME/.local/bin"
+            install -m 0755 "$BIN" "$HOME/.local/bin/splace"
+            echo "splace installed to $HOME/.local/bin/splace"
+            echo "Ensure $HOME/.local/bin is in your PATH"
+          fi
+          EOF
+          chmod +x artifacts/install-${{ matrix.os }}.sh
+      - name: Archive installer
+        run: |
+          cd artifacts
+          zip -j splace-${{ matrix.os }}-installer.zip install-${{ matrix.os }}.sh
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: splace-${{ matrix.os }}-installer
+          path: artifacts/splace-${{ matrix.os }}-installer.zip
