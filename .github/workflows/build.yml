@@ -75,14 +75,6 @@ jobs:
         run: |
           choco install nsis -y
 
-      - name: Prepare binary for installer (Windows)
-        if: matrix.os == 'windows'
-        run: |
-          # Ensure the binary exists for the installer step
-          if (!(Test-Path 'artifacts/splace-windows.exe')) {
-            throw 'artifacts/splace-windows.exe not found!'
-          }
-        shell: pwsh
 
       - name: Build Windows installer (NSIS)
         if: matrix.os == 'windows'
