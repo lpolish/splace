@@ -9,11 +9,19 @@ on:
 jobs:
   build:
     name: Build on ${{ matrix.os }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
-        os: [linux, windows, darwin]
-        arch: [amd64]
+        include:
+          - os: linux
+            arch: amd64
+            runner: ubuntu-latest
+          - os: windows
+            arch: amd64
+            runner: windows-latest
+          - os: darwin
+            arch: amd64
+            runner: macos-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
