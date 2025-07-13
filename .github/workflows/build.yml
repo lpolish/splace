@@ -47,6 +47,11 @@ jobs:
           & go build -buildvcs=false -ldflags="-s -w" -o splace-windows.exe
         shell: pwsh
 
+      - name: Ensure artifacts directory (Windows)
+        if: matrix.os == 'windows'
+        run: mkdir artifacts
+        shell: pwsh
+
       - name: Archive artifact (Linux/macOS)
         if: matrix.os != 'windows'
         run: |
@@ -66,7 +71,6 @@ jobs:
           name: splace-${{ matrix.os }}
           path: artifacts/splace-${{ matrix.os }}.zip
 
-
       - name: Install NSIS
         if: matrix.os == 'windows'
         run: |
@@ -79,7 +83,6 @@ jobs:
           Write-Host "Artifacts directory contents:"
           Get-ChildItem -Path artifacts -Recurse | Format-List
         shell: pwsh
-
 
       - name: Build Windows installer (NSIS)
         if: matrix.os == 'windows'
