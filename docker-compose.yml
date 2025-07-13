@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  splace-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: splace-artifacts:latest
+    container_name: splace-artifacts
+    volumes:
+      - ./artifacts:/out
+    command: ["ls", "-lh", "/out"]

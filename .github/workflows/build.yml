@@ -34,34 +34,62 @@ jobs:
       - name: Archive artifact
         run: |
           cd artifacts
-          zip splace-${{ matrix.os }}.zip splace-${{ matrix.os }}* 
+          zip splace-${{ matrix.os }}.zip splace-${{ matrix.os }}*
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: splace-${{ matrix.os }}
           path: artifacts/splace-${{ matrix.os }}.zip
-      - name: Generate installer script
+
+
+      - name: Install NSIS
+        if: matrix.os == 'windows'
         run: |
-          cat > artifacts/install-${{ matrix.os }}.sh << 'EOF'
+          choco install nsis -y
+
+      - name: Build Windows installer (NSIS)
+        if: matrix.os == 'windows'
+        run: |
+          makensis -V2 splace-installer.nsi
+
+      - name: Upload Windows installer
+        if: matrix.os == 'windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: splace-windows-installer-exe
+          path: splace-installer.exe
+
+      - name: Build macOS installer (.pkg)
+        if: matrix.os == 'darwin'
+        run: |
+          mkdir -p pkgroot/usr/local/bin
+          cp artifacts/splace-darwin pkgroot/usr/local/bin/splace
+          pkgbuild --root pkgroot --identifier com.lpolish.splace --version 0.1.1 --install-location / splace-installer.pkg
+
+      - name: Upload macOS installer
+        if: matrix.os == 'darwin'
+        uses: actions/upload-artifact@v4
+        with:
+          name: splace-macos-installer-pkg
+          path: splace-installer.pkg
+
+      - name: Generate Linux installer script
+        if: matrix.os == 'linux'
+        run: |
+          cat > artifacts/install-linux.sh << 'EOF'
           #!/usr/bin/env bash
           set -e
-
-          # Installer for splace on ${{ matrix.os }}
-          BIN="splace-${{ matrix.os }}$( [ "${{ matrix.os }}" = "windows" ] && echo .exe )"
+          BIN="splace-linux"
           if [ ! -f "$BIN" ]; then
             echo "Binary $BIN not found"
             exit 1
           fi
-
-          # Parse install mode
           GLOBAL=false
           if [ "$1" = "--global" ] || [ "$1" = "-g" ]; then
             GLOBAL=true
           fi
-
           if [ "$GLOBAL" = true ]; then
-            # System-wide install
             if ! command -v sudo >/dev/null 2>&1; then
               echo "sudo is required for global installation"
               exit 1
@@ -70,7 +98,6 @@ jobs:
             sudo install -m 0755 "$BIN" /usr/local/bin/splace
             echo "splace installed to /usr/local/bin/splace"
           else
-            # Per-user install
             echo "Installing splace for current user..."
             mkdir -p "$HOME/.local/bin"
             install -m 0755 "$BIN" "$HOME/.local/bin/splace"
@@ -78,13 +105,17 @@ jobs:
             echo "Ensure $HOME/.local/bin is in your PATH"
           fi
           EOF
-          chmod +x artifacts/install-${{ matrix.os }}.sh
-      - name: Archive installer
+          chmod +x artifacts/install-linux.sh
+
+      - name: Archive Linux installer
+        if: matrix.os == 'linux'
         run: |
           cd artifacts
-          zip -j splace-${{ matrix.os }}-installer.zip install-${{ matrix.os }}.sh
-      - name: Upload installer artifact
+          zip -j splace-linux-installer.zip install-linux.sh
+
+      - name: Upload Linux installer artifact
+        if: matrix.os == 'linux'
         uses: actions/upload-artifact@v4
         with:
-          name: splace-${{ matrix.os }}-installer
-          path: artifacts/splace-${{ matrix.os }}-installer.zip
+          name: splace-linux-installer
+          path: artifacts/splace-linux-installer.zip
