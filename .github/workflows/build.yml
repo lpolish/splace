@@ -37,7 +37,7 @@ jobs:
           zip splace-${{ matrix.os }}.zip splace-${{ matrix.os }}* 
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: splace-${{ matrix.os }}
           path: artifacts/splace-${{ matrix.os }}.zip
@@ -84,7 +84,7 @@ jobs:
           cd artifacts
           zip -j splace-${{ matrix.os }}-installer.zip install-${{ matrix.os }}.sh
       - name: Upload installer artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: splace-${{ matrix.os }}-installer
           path: artifacts/splace-${{ matrix.os }}-installer.zip
