@@ -1,5 +1,11 @@
+
 # splace
 
+<!-- Badges -->
+![Build](https://github.com/lpolish/splace/actions/workflows/build.yml/badge.svg)
+![Release](https://img.shields.io/github/v/release/lpolish/splace?include_prereleases&label=release)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lpolish/splace)](https://goreportcard.com/report/github.com/lpolish/splace)
+[![Go Reference](https://pkg.go.dev/badge/github.com/lpolish/splace.svg)](https://pkg.go.dev/github.com/lpolish/splace)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 
 Encrypted directory bookmarks manager, cross-platform CLI tool.
