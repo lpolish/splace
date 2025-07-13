@@ -44,10 +44,7 @@ jobs:
       - name: Build binary (Windows)
         if: matrix.os == 'windows'
         run: |
-          mkdir artifacts
-          $ext = ".exe"
-          $output = "artifacts/splace-windows$ext"
-          & go build -buildvcs=false -ldflags="-s -w" -o $output
+          & go build -buildvcs=false -ldflags="-s -w" -o splace-windows.exe
         shell: pwsh
 
       - name: Archive artifact (Linux/macOS)
@@ -60,7 +57,7 @@ jobs:
       - name: Archive artifact (Windows)
         if: matrix.os == 'windows'
         run: |
-          Compress-Archive -Path artifacts/splace-windows.exe -DestinationPath artifacts/splace-windows.zip
+          Compress-Archive -Path splace-windows.exe -DestinationPath artifacts/splace-windows.zip
         shell: pwsh
 
       - name: Upload artifact
