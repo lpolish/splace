@@ -48,8 +48,6 @@ jobs:
           $ext = ".exe"
           $output = "artifacts/splace-windows$ext"
           & go build -buildvcs=false -ldflags="-s -w" -o $output
-          # Always copy the binary to the expected installer path (overwrite if needed)
-          Copy-Item -Path $output -Destination "artifacts/splace-windows.exe" -Force
         shell: pwsh
 
       - name: Archive artifact (Linux/macOS)
