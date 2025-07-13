@@ -48,6 +48,8 @@ jobs:
           $ext = ".exe"
           $output = "artifacts/splace-windows$ext"
           & go build -buildvcs=false -ldflags="-s -w" -o $output
+          # Always copy the binary to the expected installer path (overwrite if needed)
+          Copy-Item -Path $output -Destination "artifacts/splace-windows.exe" -Force
         shell: pwsh
 
       - name: Archive artifact (Linux/macOS)
@@ -74,6 +76,15 @@ jobs:
         if: matrix.os == 'windows'
         run: |
           choco install nsis -y
+
+      - name: Prepare binary for installer (Windows)
+        if: matrix.os == 'windows'
+        run: |
+          # Ensure the binary exists for the installer step
+          if (!(Test-Path 'artifacts/splace-windows.exe')) {
+            throw 'artifacts/splace-windows.exe not found!'
+          }
+        shell: pwsh
 
       - name: Build Windows installer (NSIS)
         if: matrix.os == 'windows'
