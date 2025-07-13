@@ -79,6 +79,20 @@ jobs:
         if: matrix.os == 'windows'
         run: |
           makensis -V2 splace-installer.nsi
+        shell: pwsh
+
+      - name: Archive Windows installer
+        if: matrix.os == 'windows'
+        run: |
+          Compress-Archive -Path artifacts/splace-windows-installer.exe -DestinationPath artifacts/splace-windows-installer.zip
+        shell: pwsh
+
+      - name: Upload Windows installer
+        if: matrix.os == 'windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: splace-windows-installer
+          path: artifacts/splace-windows-installer.zip
 
       - name: Upload Windows installer
         if: matrix.os == 'windows'
