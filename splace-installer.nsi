@@ -10,7 +10,7 @@ Page instfiles
 
 Section "Install"
   SetOutPath "$INSTDIR"
-  File "artifacts/splace-windows.exe"
+  File "splace-windows.exe"
   ; Create a shortcut
   CreateShortCut "$DESKTOP\splace.lnk" "$INSTDIR\splace-windows.exe"
   MessageBox MB_OK "Add $INSTDIR to your PATH manually to use 'splace' from any terminal."
