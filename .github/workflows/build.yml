@@ -75,6 +75,14 @@ jobs:
         run: |
           choco install nsis -y
 
+      - name: Debug artifacts before NSIS
+        if: matrix.os == 'windows'
+        run: |
+          Write-Host "Current directory: $(Get-Location)"
+          Write-Host "Artifacts directory contents:"
+          Get-ChildItem -Path artifacts -Recurse | Format-List
+        shell: pwsh
+
 
       - name: Build Windows installer (NSIS)
         if: matrix.os == 'windows'
