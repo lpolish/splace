@@ -106,12 +106,7 @@ jobs:
           name: splace-windows-installer
           path: artifacts/splace-windows-installer.zip
 
-      - name: Upload Windows installer
-        if: matrix.os == 'windows'
-        uses: actions/upload-artifact@v4
-        with:
-          name: splace-windows-installer-exe
-          path: splace-installer.exe
+
 
       - name: Build macOS installer (.pkg)
         if: matrix.os == 'darwin'
