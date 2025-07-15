@@ -65,7 +65,7 @@ jobs:
       - name: Archive artifact (Windows)
         if: matrix.os == 'windows'
         run: |
-          Compress-Archive -Path splace-windows.exe -DestinationPath artifacts/splace-windows.zip
+          Compress-Archive -Path splace.exe -DestinationPath artifacts/splace-windows.zip
         shell: pwsh
 
       - name: Upload artifact
@@ -74,10 +74,6 @@ jobs:
           name: splace-${{ matrix.os }}
           path: artifacts/splace-${{ matrix.os }}.zip
 
-      - name: Install NSIS
-        if: matrix.os == 'windows'
-        run: |
-          choco install nsis -y
 
       - name: Debug artifacts before NSIS
         if: matrix.os == 'windows'
@@ -90,7 +86,8 @@ jobs:
       - name: Build Windows installer (NSIS)
         if: matrix.os == 'windows'
         run: |
-          makensis -V2 splace-installer.nsi
+          # Use NSIS from Program Files (x86)
+          & "${env:ProgramFiles(x86)}\\NSIS\\makensis.exe" -V2 splace-installer.nsi
         shell: pwsh
 
       - name: Archive Windows installer
