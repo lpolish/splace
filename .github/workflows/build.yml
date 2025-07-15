@@ -41,18 +41,18 @@ jobs:
             go build -buildvcs=false -ldflags="-s -w" -o artifacts/splace-${{ matrix.os }}${ext}
         shell: bash
 
+
       - name: Build binary (Windows)
         if: matrix.os == 'windows'
         run: |
-          & go build -buildvcs=false -ldflags="-s -w" -o splace-windows.exe
+          & go build -buildvcs=false -ldflags="-s -w" -o splace.exe
         shell: pwsh
-
 
       - name: Ensure artifacts directory (Windows)
         if: matrix.os == 'windows'
         run: |
           mkdir artifacts
-          Copy-Item splace-windows.exe artifacts/splace-windows.exe
+          Copy-Item splace.exe artifacts/splace.exe
         shell: pwsh
 
       - name: Archive artifact (Linux/macOS)
