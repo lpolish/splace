@@ -3,11 +3,14 @@ set -eo pipefail
 
 # Local build script to mimic GitHub Actions release workflow
 mkdir -p artifacts
+
+# Build using Docker (no Go required on host)
 for os in linux windows darwin; do
   ext=""
   if [ "$os" = "windows" ]; then ext=".exe"; fi
-  echo "Building for $os..."
-  GOOS=$os GOARCH=amd64 go build -buildvcs=false -ldflags="-s -w" -o artifacts/splace-$os$ext
+  echo "Building for $os using Docker..."
+  docker run --rm -v "$(pwd)":/app -w /app golang:1.22 \
+    /bin/bash -c "GOOS=$os GOARCH=amd64 go build -buildvcs=false -ldflags='-s -w' -o artifacts/splace-$os$ext"
   echo "Packaging splace-$os$ext into ZIP..."
   (cd artifacts && zip -j splace-$os.zip splace-$os$ext)
   echo "Generating installer script for $os..."

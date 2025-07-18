@@ -26,26 +26,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Go
+      # Only set up Go for Windows, Docker will be used for Linux/macOS
+      - name: Set up Go (Windows only)
+        if: matrix.os == 'windows'
         uses: actions/setup-go@v4
         with:
-          go-version: '1.21'
+          go-version: '1.22'
 
-      - name: Build binary (Linux/macOS)
+      - name: Build binary (Linux/macOS) using Docker
         if: matrix.os != 'windows'
         run: |
           mkdir -p artifacts
           ext=""
           if [ "${{ matrix.os }}" = "windows" ]; then ext=".exe"; fi
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} \
-            go build -buildvcs=false -ldflags="-s -w" -o artifacts/splace-${{ matrix.os }}${ext}
+          docker run --rm -v "$PWD:/app" -w /app golang:1.22 \
+            /bin/bash -c "GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -buildvcs=false -ldflags='-s -w' -o artifacts/splace-${{ matrix.os }}${ext}"
         shell: bash
 
 
       - name: Build binary (Windows)
         if: matrix.os == 'windows'
         run: |
-          & go build -buildvcs=false -ldflags="-s -w" -o splace.exe
+          go build -buildvcs=false -ldflags="-s -w" -o splace.exe
         shell: pwsh
 
       - name: Ensure artifacts directory (Windows)
