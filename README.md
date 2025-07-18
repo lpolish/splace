@@ -31,6 +31,22 @@ Encrypted directory bookmarks manager, cross-platform CLI tool.
 
 ### From Source
 
+#### Using Docker (no Go required on host)
+```bash
+./build.sh
+```
+
+#### Using PowerShell (Windows, no Go required on host)
+```powershell
+./build.ps1
+```
+If you see an error about script execution policy, run the following in an elevated PowerShell window:
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+This allows running local scripts like `build.ps1`.
+
+#### Manual Go build (if you have Go installed)
 ```bash
 go build -buildvcs=false -ldflags="-s -w" -o splace
 export SPLACE_KEY=$(openssl rand -base64 32)
