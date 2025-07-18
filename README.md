@@ -32,16 +32,21 @@ Encrypted directory bookmarks manager, cross-platform CLI tool.
 ### From Source
 
 
+
 #### Prerequisite: Install Docker (Windows)
 
-To build with Docker on Windows, install Docker Desktop using PowerShell as Administrator:
+To build with Docker on Windows, install Docker Desktop:
 
-1. Open PowerShell as Administrator
-2. Run the following command to download the official installer:
+1. Download the official installer from your browser or with PowerShell:
    ```powershell
    Invoke-WebRequest -Uri "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe" -OutFile "$env:TEMP\DockerDesktopInstaller.exe"
-   Start-Process "$env:TEMP\DockerDesktopInstaller.exe" -Wait
    ```
+2. Run the installer (requires user interaction):
+   - Double-click the downloaded file, **or**
+   - From PowerShell as Administrator:
+     ```powershell
+     Start-Process "$env:TEMP\DockerDesktopInstaller.exe" -Verb RunAs
+     ```
 3. Follow the installation prompts and restart your computer if required.
 4. After installation, verify Docker is available:
    ```powershell
