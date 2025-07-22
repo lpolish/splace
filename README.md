@@ -85,6 +85,30 @@ splace n <idx>  # show bookmark at 1-based index
 splace all      # list all saved directories
 ```
 
+## Useful function for your ~/.bashrc
+For automatically changing dir into your latest place or the n'th place from splace
+
+```bash
+cdplace() {
+    local dir
+    if [ $# -eq 0 ]; then
+        dir=$(splace l 2>/dev/null)
+    else
+        dir=$(splace n "$1" 2>/dev/null)
+    fi
+
+    if [ -n "$dir" ] && [ -d "$dir" ]; then
+        cd "$dir" || {
+            echo "Error: Failed to change to directory '$dir'"
+            return 1
+        }
+    else
+        echo "Error: No valid directory found for the given input"
+        return 1
+    fi
+}
+```
+
 ## Environment
 
 - `SPLACE_KEY` (optional): base64-encoded 32-byte AES key. Auto-generated on first run at `~/.splace/key`.
